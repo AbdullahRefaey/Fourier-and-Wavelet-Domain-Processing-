@@ -1,0 +1,72 @@
+##################### Import Python Libraries/Packages #########################
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+import matplotlib.patches as mpatches
+import requests
+from urllib.request import urlopen
+import PIL
+from PIL import Image
+from scipy import ndimage as ndi
+from matplotlib.colors import ListedColormap
+from skimage import morphology
+from skimage.morphology import disk
+from skimage.filters import threshold_otsu
+from skimage import color
+from skimage import data
+from skimage import feature, measure
+from skimage.segmentation import clear_border
+from skimage.measure import label, regionprops
+from skimage.morphology import closing, square
+from skimage.color import label2rgb
+from google.colab import files
+%matplotlib inline
+
+uploaded = files.upload()
+in_img = Image.open('periodic-noise1.png')   # in_img: Grayscale image
+im = plt.imread('periodic-noise1.png').astype(float)
+
+plt.figure()
+plt.imshow(im, plt.cm.gray)
+plt.title('Original image')
+
+# Compute the 2d FFT of the input image
+from scipy import fftpack
+im_fft = fftpack.fft2(im)
+
+def plot_spectrum(im_fft):
+    from matplotlib.colors import LogNorm
+    # A logarithmic colormap
+    plt.imshow(np.abs(im_fft), norm=LogNorm(vmin=5))
+    plt.colorbar()
+
+plt.figure()
+plot_spectrum(im_fft)
+plt.title('Fourier transform')
+
+# Filter in FFT
+keep_fraction = 0.1
+im_fft2 = im_fft.copy()
+
+# Set r and c to be the number of rows and columns of the array.
+r, c = im_fft2.shape
+im_fft2[int(r*keep_fraction):int(r*(1-keep_fraction))] = 0
+im_fft2[:, int(c*keep_fraction):int(c*(1-keep_fraction))] = 0
+
+plt.figure()
+plot_spectrum(im_fft2)
+plt.title('Filtered Spectrum')
+
+from scipy import ndimage
+im_blur = ndimage.gaussian_filter(im, 4)
+plt.figure()
+plt.imshow(im_blur, plt.cm.gray)
+plt.title('Blurred image')
+
+# Reconstruct the final image
+im_new = fftpack.ifft2(im_fft2).real
+plt.figure()
+plt.imshow(im_new, plt.cm.gray)
+plt.title('Reconstructed Image')
+
+plt.show()
