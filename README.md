@@ -4,6 +4,6 @@ Language: Python 3.5
 
 Environment: Google Co-lab.
 
-This repository shows an approach for image processign based on Fourier Transform and Wavelet Domain Processing. 
+This repository shows an approach for image processing based on Fourier Transform (FT) and Wavelet Domain (WD) Processing. 
 
 It will be updated soon.
